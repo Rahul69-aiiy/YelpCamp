@@ -19,15 +19,17 @@ const LocalStrategy = require('passport-local')
 const User = require('./models/user')
 const sanitize = require('./utils/mongoSanitize.js');
 const helmet = require('helmet')
+const MongoDBStore = require("connect-mongo")(session);
+const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelp-camp';
 
-mongoose.connect('mongodb://127.0.0.1:27017/farmStand')
+mongoose.connect(dbUrl);
 
 const db = mongoose.connection
 db.on("error", console.error.bind(console, "connection error:"))
 db.once("open", () => {
     console.log("Database connected")
 })
-
+ 
 app.engine('ejs', ejsMate)
 app.use(express.urlencoded({extended: true}))
 app.use(methodOverride('_method'))
@@ -37,9 +39,22 @@ app.set('views', path.join(__dirname, 'views'))
 app.set('query parser', 'extended');
 app.use(sanitize({ replaceWith: '_' }));
 
+const secret = process.env.SECRET || 'thisshouldbeabettersecret!'
+
+const store = new MongoDBStore({
+    url: dbUrl,
+    secret,
+    touchAfter: 24 * 60 * 60
+})
+
+store.on("error", function(e) {
+    console.log("SESSION STORE ERROR", E)
+})
+
 const sessionConfig = {
+    store,
     name: 'session',
-    secret: 'thisshouldbeabettersecret!',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
