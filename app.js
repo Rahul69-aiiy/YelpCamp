@@ -5,7 +5,6 @@ if(process.env.NODE_ENV !== "production") {
 const express = require('express');
 const app = express();
 const path = require('path')
-const mongoose = require('mongoose')
 const ejsMate = require('ejs-mate')
 const methodOverride = require('method-override');
 const ExpressError = require('./utils/ExpressError');
@@ -20,16 +19,10 @@ const User = require('./models/user')
 const sanitize = require('./utils/mongoSanitize.js');
 const helmet = require('helmet')
 const {MongoStore} = require('connect-mongo');
+const connectDB = require('./config/db.js');
 const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelp-camp';
-
-mongoose.connect(dbUrl);
-
-const db = mongoose.connection
-db.on("error", console.error.bind(console, "connection error:"))
-db.once("open", () => {
-    console.log("Database connected")
-})
  
+connectDB();
 app.engine('ejs', ejsMate)
 app.use(express.urlencoded({extended: true}))
 app.use(methodOverride('_method'))
