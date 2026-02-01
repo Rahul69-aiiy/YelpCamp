@@ -22,7 +22,7 @@ const {MongoStore} = require('connect-mongo');
 const connectDB = require('./config/db.js');
 const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelp-camp';
  
-connectDB();
+connectDB(dbUrl);
 app.engine('ejs', ejsMate)
 app.use(express.urlencoded({extended: true}))
 app.use(methodOverride('_method'))
