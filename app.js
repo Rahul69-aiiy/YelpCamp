@@ -22,7 +22,6 @@ const {MongoStore} = require('connect-mongo');
 const connectDB = require('./config/db.js');
 const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelp-camp';
  
-connectDB(dbUrl);
 app.engine('ejs', ejsMate)
 app.use(express.urlencoded({extended: true}))
 app.use(methodOverride('_method'))
@@ -148,6 +147,12 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('error', { err })
 })
 
-app.listen(3000, () => {
-    console.log('Serving on port 3000')
-})
+async function startServer() {
+    await connectDB(dbUrl);
+
+    app.listen(3000, () => {
+        console.log("Serving on port 3000");
+    });
+}
+
+startServer();
